@@ -1,0 +1,47 @@
+﻿@model UniqueProducts.Models.Employee
+
+@{
+    ViewData["Title"] = "Create";
+}
+<h1>Добавить</h1>
+
+<h4>Сотрудник</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="EmployeeName" class="control-label"></label>
+                <input asp-for="EmployeeName" class="form-control" />
+                <span asp-validation-for="EmployeeName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeSurname" class="control-label"></label>
+                <input asp-for="EmployeeSurname" class="form-control" />
+                <span asp-validation-for="EmployeeSurname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeeMidname" class="control-label"></label>
+                <input asp-for="EmployeeMidname" class="form-control" />
+                <span asp-validation-for="EmployeeMidname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EmployeePosition" class="control-label"></label>
+                <input asp-for="EmployeePosition" class="form-control" />
+                <span asp-validation-for="EmployeePosition" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Добавить" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Назад</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

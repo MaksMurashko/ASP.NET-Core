@@ -1,0 +1,164 @@
+﻿@using UniqueProducts.ViewModels.Orders
+@using UniqueProducts.ViewModels
+@using UniqueProducts.Models
+@model PaginationViewModel<Order, OrderFilterViewModel, OrderSortViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>Заказы</h1>
+<form method="get" class="mt-1">
+    <label class="form-inline mt-1">Заказы на сумму до: </label>
+    <input class="form-control" name="price" value="@(Model.FilterViewModel.SelectedOrderPrice)" />
+    <label class="form-inline mt-1 ml-2">Месяц заказа: </label>
+    <select class="form-control" name="month" asp-for="@(Model.FilterViewModel.SelectedOrderMonth)">
+        <option value="">Все</option>
+        <option value="1">Январь</option>
+        <option value="2">Февраль</option>
+        <option value="3">Март</option>
+        <option value="4">Апрель</option>
+        <option value="5">Май</option>
+        <option value="6">Июнь</option>
+        <option value="7">Июль</option>
+        <option value="8">Август</option>
+        <option value="9">Сентябрь</option>
+        <option value="10">Октябрь</option>
+        <option value="11">Ноябрь</option>
+        <option value="12">Декабрь</option>
+    </select>
+    <input type="submit" value="Фильтр" class="mt-2 btn btn-primary" />
+</form>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole("SuperAdmin") || User.IsInRole("Admin")))
+{
+    <p>
+        <a asp-action="Create">Добавить заказ</a>
+    </p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.OrderNSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Номер заказа</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.OrderDateSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Дата заказа</a>
+             </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.OrderClientSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Компания</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.OrderProductSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Изделие</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.OrderAmountSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Количество изделий</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.TotalPriceSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Полная стоимость</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.OrderEmployeeSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Ответственный сотрудник</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.IsCompletedSort"
+                   asp-route-month="@Model.FilterViewModel.SelectedOrderMonth"
+                   asp-route-price="@Model.FilterViewModel.SelectedOrderPrice">Завершён</a>
+            </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderId)
+            </td>
+            <td>
+                    @{
+                        string formattedDate = item.OrderDate.HasValue ? item.OrderDate.Value.ToShortDateString() : string.Empty;
+                    }
+                    @Html.DisplayFor(modelItem => formattedDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Client.Company)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Product.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.OrderAmount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalPrice)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Employee.EmployeeSurname)
+            </td>
+            <td>
+                    @if (item.IsCompleted.HasValue && item.IsCompleted.Value)
+                    {
+                        <text>Да</text>
+                    }
+                    else
+                    {
+                        <text>Нет</text>
+                    }
+            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+
+                    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                    {
+                        <span><a asp-action="Edit" asp-route-id="@item.OrderId">Изменить</a> |</span>
+                        <span><a asp-action="Delete" asp-route-id="@item.OrderId">Удалить</a> |</span>
+                        <a asp-action="Details" asp-route-id="@item.OrderId">Подробно</a>
+                    }
+                    else if (User.IsInRole("User"))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.OrderId">Подробно</a>
+                    }
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-price="@Model.FilterViewModel.SelectedOrderPrice"
+           page-url-month="@Model.FilterViewModel.SelectedOrderMonth"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"></page-link>

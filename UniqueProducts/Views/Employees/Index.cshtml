@@ -1,0 +1,102 @@
+﻿﻿@using UniqueProducts.ViewModels
+@using UniqueProducts.Models
+@using UniqueProducts.ViewModels.Employees
+@model PaginationViewModel<Employee, EmployeeFilterViewModel, EmployeeSortViewModel>
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>Сотрудники</h1>
+
+<form method="get" class="mt-1">
+    <label class="form-inline">Фамилия: </label>
+    <input class="form-control" name="surname" value="@Model.FilterViewModel.SelectedSurname" />
+
+    <label class="form-inline mt-1">Должность: </label>
+    <input class="form-control" name="position" value="@Model.FilterViewModel.SelectedPosition" />
+
+    <input type="submit" value="Фильтр" class="btn btn-primary mt-2" />
+</form>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole("SuperAdmin") || User.IsInRole("Admin")))
+{
+    <p>
+        <a asp-action="Create">Добавить сотрудника</a>
+    </p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@(Model.PageViewModel.PageNumber)"
+                   asp-route-sortOrder="@(Model.SortViewModel.NameSort)"
+                   asp-route-surname="@(Model.FilterViewModel.SelectedSurname)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)">Имя</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@(Model.PageViewModel.PageNumber)"
+                   asp-route-sortOrder="@(Model.SortViewModel.SurnameSort)"
+                   asp-route-surname="@(Model.FilterViewModel.SelectedSurname)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)">Фамилия</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@(Model.PageViewModel.PageNumber)"
+                   asp-route-sortOrder="@(Model.SortViewModel.MidNameSort)"
+                   asp-route-surname="@(Model.FilterViewModel.SelectedSurname)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)">Отчество</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@(Model.PageViewModel.PageNumber)"
+                   asp-route-sortOrder="@(Model.SortViewModel.PositionSort)"
+                   asp-route-surname="@(Model.FilterViewModel.SelectedSurname)"
+                   asp-route-position="@(Model.FilterViewModel.SelectedPosition)">Должность</a>
+            </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeSurname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeMidname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeePosition)
+            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+
+                    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                    {
+                        <span><a asp-action="Edit" asp-route-id="@item.EmployeeId">Изменить</a> |</span>
+                        <span><a asp-action="Delete" asp-route-id="@item.EmployeeId">Удалить</a> |</span>
+                        <a asp-action="Details" asp-route-id="@item.EmployeeId">Подробно</a>
+                    }
+                    else if (User.IsInRole("User"))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.EmployeeId">Подробно</a>
+                    }
+                </td>
+            }
+        </tr>
+}
+    </tbody>
+</table>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-surname="@(Model.FilterViewModel.SelectedSurname)"
+           page-url-position="@(Model.FilterViewModel.SelectedPosition)"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"></page-link>

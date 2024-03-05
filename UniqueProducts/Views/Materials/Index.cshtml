@@ -1,0 +1,90 @@
+﻿@using UniqueProducts.ViewModels.Materials
+@using UniqueProducts.ViewModels
+@using UniqueProducts.Models
+@model PaginationViewModel<Material, MaterialFilterViewModel, MaterialSortViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>Материалы</h1>
+<form method="get" class="mt-1">
+    <label class="form-inline">Материал: </label>
+    <input class="form-control" name="material" value="@(Model.FilterViewModel.SelectedMaterialName)" />
+    <label class="form-inline mt-1">Код материала: </label>
+    <input class="form-control" name="code" value="@(Model.FilterViewModel.SelectedMaterialCode)" />
+    <input type="submit" value="Фильтр" class="mt-2 btn btn-primary" />
+</form>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole("SuperAdmin") || User.IsInRole("Admin")))
+{
+    <p>
+        <a asp-action="Create">Добавить материал</a>
+    </p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-material="@Model.FilterViewModel.SelectedMaterialName"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.MaterialCodeSort"
+                   asp-route-code="@Model.FilterViewModel.SelectedMaterialCode">Код материала</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-material="@Model.FilterViewModel.SelectedMaterialName"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.MaterialNameSort"
+                   asp-route-code="@Model.FilterViewModel.SelectedMaterialCode">Название</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-material="@Model.FilterViewModel.SelectedMaterialName"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.MaterialNameSort"
+                   asp-route-code="@Model.FilterViewModel.SelectedMaterialCode">Описание</a>
+            </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaterialId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaterialName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MaterialDescript)
+            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+
+                    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                    {
+                        <span><a asp-action="Edit" asp-route-id="@item.MaterialId">Изменить</a> |</span>
+                        <span><a asp-action="Delete" asp-route-id="@item.MaterialId">Удалить</a> |</span>
+                        <a asp-action="Details" asp-route-id="@item.MaterialId">Подробно</a>
+                    }
+                    else if (User.IsInRole("User"))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.MaterialId">Подробно</a>
+                    }
+                </td>
+            }
+        </tr>
+}
+    </tbody>
+</table>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-material="@(Model.FilterViewModel.SelectedMaterialName)"
+           page-url-code="@(Model.FilterViewModel.SelectedMaterialCode)"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"></page-link>

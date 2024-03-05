@@ -1,0 +1,128 @@
+﻿@using UniqueProducts.ViewModels.Products
+@using UniqueProducts.ViewModels
+@using UniqueProducts.Models
+@model PaginationViewModel<Product, ProductFilterViewModel, ProductSortViewModel>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Изделия</h1>
+<form method="get" class="mt-1">
+    <label class="form-inline mt-1">Название изделия: </label>
+    <input class="form-control" name="name" value="@(Model.FilterViewModel.SelectedProductName)" />
+    <input type="submit" value="Фильтр" class="mt-2 btn btn-primary" />
+</form>
+
+@if (User.Identity.IsAuthenticated && (User.IsInRole("SuperAdmin") || User.IsInRole("Admin")))
+{
+    <p>
+        <a asp-action="Create">Добавить изделие</a>
+    </p>
+}
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductCodeSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Код изделия</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductNameSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Название</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductDescriptSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Описание</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductWeightSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Вес (кг)</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductDiameterSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Диаметр (см)</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductColorSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Цвет</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductMaterialSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Материал</a>
+            </th>
+            <th>
+                <a asp-action="Index"
+                   asp-route-page="@Model.PageViewModel.PageNumber"
+                   asp-route-sortOrder="@Model.SortViewModel.ProductPriceSort"
+                   asp-route-name="@Model.FilterViewModel.SelectedProductName">Цена</a>
+            </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Items) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductDescript)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductWeight)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductDiameter)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductColor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Material.MaterialName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.ProductPrice)
+            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>    
+
+                    @if (User.IsInRole("SuperAdmin") || User.IsInRole("Admin"))
+                    {
+                        <span><a asp-action="Edit" asp-route-id="@item.ProductId">Изменить</a> |</span>
+                        <span><a asp-action="Delete" asp-route-id="@item.ProductId">Удалить</a> |</span>
+                        <a asp-action="Details" asp-route-id="@item.ProductId">Подробно</a>
+                    }
+                    else if (User.IsInRole("User"))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.ProductId">Подробно</a>
+                    }
+                </td>
+            }
+        </tr>
+}
+    </tbody>
+</table>
+<page-link page-model="Model.PageViewModel" page-action="Index"
+           page-url-name="@Model.FilterViewModel.SelectedProductName"
+           page-url-sortOrder="@(Model.SortViewModel.Current)"></page-link>
